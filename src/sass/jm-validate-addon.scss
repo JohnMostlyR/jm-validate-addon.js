@@ -1,0 +1,78 @@
+// GENERIC
+@import 'generic/box-sizing';
+
+.jm-validate-addon {
+  &__line {
+    &:nth-child(1n + 2) {
+      margin-top: .5rem;
+    }
+  }
+
+  &__label {
+    margin-right: .5rem;
+    text-transform: uppercase;
+  }
+
+  &__tooltip {
+    background: #333;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .6), rgba(0, 0, 0, .8));
+    border-top: 1px solid white;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
+    color: white;
+    line-height: 1.5;
+    padding: 15px;
+    opacity: 0;
+    position: absolute;
+    text-align: center;
+    text-shadow: 0 1px rgba(0, 0, 0, .5);
+    transition: opacity .5s;
+    z-index: 100;
+
+    &::after {
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid #333;
+      border-top-color: rgba(0, 0, 0, .7);
+      bottom: -10px;
+      content: '';
+      height: 0;
+      left: 50%;
+      margin-left: -10px;
+      position: absolute;
+      width: 0;
+    }
+
+    &--show {
+      opacity: 1;
+    }
+
+    &--with-labels {
+      text-align: left;
+    }
+  }
+
+  &__top {
+    &::after {
+      border-top-color: transparent;
+      border-bottom: 10px solid #333;
+      border-bottom-color: rgba(0, 0, 0, .6);
+      bottom: auto;
+      top: -20px;
+    }
+  }
+
+  &__left {
+    &::after {
+      left: 10px;
+      margin: 0;
+    }
+  }
+
+  &__right {
+    &::after {
+      left: auto;
+      margin: 0;
+      right: 10px;
+    }
+  }
+}

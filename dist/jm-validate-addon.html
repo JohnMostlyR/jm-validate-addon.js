@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>A Basic Slider</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="jm-validate-addon.css">
+    <style>
+        html {
+            font-family: Helvetica, sans-serif;
+        }
+
+        body {
+            /*align-items: center;*/
+            display: flex;
+            height: 100vh;
+            /*justify-content: center;*/
+        }
+
+        main {
+            max-width: 980px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <form name="the-form" action="/" novalidate>
+        <label for="subject">Subject</label>
+        <input id="subject" name="subject" placeholder="Required field" autofocus required>
+        <br>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Required field" required minlength="5"></textarea>
+        <br>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="required@field.com" required>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+</main>
+<script src="jm-validate-addon.js"></script>
+<script>
+  window.addEventListener('load', function (ev) {
+    var validate = new ValidateAddon('the-form', function (errors) {});
+  });
+</script>
+</body>
+</html>
