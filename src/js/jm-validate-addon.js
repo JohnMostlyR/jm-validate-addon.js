@@ -1,5 +1,14 @@
 'use strict';
 
+/**
+ * Creates a new ValidateAddon.
+ * @description A HTML5 form validation add on that uses the HTML5 Constraint Validation API and provides the ability to
+ * style the tooltip to your liking. It also does not throw errors at the user when the user did not do anything yet.
+ * Instead a, configurable, message wil be shown when a user moves away from the field and, or, on submitting the form.
+ * @author Johan Meester <walter.doodah@gmail.com>
+ * @licence MIT - http://opensource.org/licenses/MIT
+ * @copyright Johan Meester 2017
+ */
 (function (root) {
   const DOC = root.document;
   const defaults = {
@@ -16,16 +25,29 @@
         onSubmit: 'Sorry but we really need this information from you',
       },
     },
-    callback: (errors) => {
-    }
   };
 
-  const messages = defaults.messages;
+  let messages = defaults.messages;
 
+  /**
+   * @function _formByNameOrNode
+   * @description When passed a node it just returns it. When passed the form name it finds the node by name in the
+   * forms list.
+   * @param {!object|string} formNameOrNode - A reference to the form or the name of the form
+   * @returns {object} - A reference to the form
+   * @private
+   */
   const _formByNameOrNode = function (formNameOrNode) {
     return (typeof formNameOrNode === 'object') ? formNameOrNode : DOC.forms[formNameOrNode];
   };
 
+  /**
+   * @function _getElementLeft
+   * @description Gets the element's left position on the screen
+   * @param {object} element - Reference to the element
+   * @returns {number|Number} - The element's left position on the screen
+   * @private
+   */
   const _getElementLeft = function (element) {
     let actualLeft = element.offsetLeft;
     let current = element.offsetParent;
@@ -36,6 +58,13 @@
     return actualLeft;
   };
 
+  /**
+   * @function _getElementTop
+   * @description Gets the element's top position on the screen
+   * @param {object} element - Reference to the element
+   * @returns {number|Number} - The element's left position on the screen
+   * @private
+   */
   const _getElementTop = function (element) {
     let actualTop = element.offsetTop;
     let current = element.offsetParent;
@@ -46,6 +75,18 @@
     return actualTop;
   };
 
+  /**
+   * @function _createMessageTooltip
+   * @description Creates the tooltip to give the user feedback on any validation issues
+   * @param {!object|string} message - When passed a string it creates the tooltip above or below the field that is not
+   * valid
+   * @param {!object|string} [name.error] message - When passed an object a tooltip is created above or below the form
+   * where each field that is not valid is on one line starting with the field's name and behind it the problem
+   * @param {!object} field - The field to attach the tooltip to
+   * @param {boolean} [autoHide=true] - When true the tooltip will be removed after x seconds. When set to false the
+   * tooltip will stay until a key is pressed or a mouse button is clicked
+   * @private
+   */
   const _createMessageTooltip = function (message, field, autoHide = false) {
     const tooltip = DOC.createElement('div');
     tooltip.id = `jm-validate-addon__tooltip-${field.name}`;
@@ -125,7 +166,15 @@
     root.addEventListener('keydown', _removeTooltip);
   };
 
-  const _provideFeedback = function (element, validationMoment = 'beforeSubmit') {
+  /**
+   * @function _getValidityState
+   * @description Get the validity state on the given element
+   * @param {!object} element - The form element
+   * @param {string} [validationMoment='beforeSubmit'] - The moment on where the validation takes place.
+   * @returns {object} - fieldName.validityState
+   * @private
+   */
+  const _getValidityState = function (element, validationMoment = 'beforeSubmit') {
     const validity = element.validity;
     let message = element.validationMessage;
 
@@ -142,27 +191,31 @@
     }
   };
 
-  function ValidateAddon(formNameOrNode, callback = defaults.callback) {
-    this.callback = callback;
-    this.errors = {};
+  /**
+   * ValidationAddon
+   * @param {object|string} formNameOrNode
+   * @param language
+   * @constructor
+   */
+  function ValidateAddon(formNameOrNode, language = 'en') {
     this.form = _formByNameOrNode(formNameOrNode) || {};
+    this.errors = {};
 
     this.fields = [...this.form.elements]
       .filter(element => {
+        // Keep only the elements that have the name attribute
         return (element.name);
       })
       .filter(element => {
+        // Keep only form elements that are not of type button
         return (element.tagName.toUpperCase() !== 'BUTTON');
       })
       .reduce((fields, element) => {
         if (!fields[element.name]) {
           element.addEventListener('blur', (ev) => {
             // When the user moves away from the field, we check if the field is valid.
-            if (element.validity.valid) {
-              // In case there is an error message visible, if the field
-              // is valid, we remove the error message.
-            } else {
-              const message = _provideFeedback(element);
+            if (!element.validity.valid) {
+              const message = _getValidityState(element);
               _createMessageTooltip(message, element);
             }
 
@@ -186,7 +239,7 @@
           if (!this.form.elements[field].validity.valid) {
             isValid = false;
             this.errors[field] = {
-              error: _provideFeedback(this.form.elements[field], 'onSubmit'),
+              error: _getValidityState(this.form.elements[field], 'onSubmit'),
             };
           }
         });
@@ -197,10 +250,6 @@
       }
     }, false);
   }
-
-  ValidateAddon.prototype = {
-    constructor: ValidateAddon,
-  };
 
   root.ValidateAddon = ValidateAddon;
 })(typeof global !== 'undefined' ? global : window);
