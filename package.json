@@ -1,13 +1,21 @@
 {
   "name": "jm-validate-addon.js",
   "version": "0.0.1",
-  "description": "A HTML5 form validator addon with no dependencies.",
+  "description": "A HTML5 form validation addon with no dependencies.",
   "main": "jm-validate-addon.js",
   "style": "jm-validate-addon.scss",
   "scripts": {},
   "author": "Johan Meester",
   "license": "MIT",
-  "keywords": [],
+  "keywords": [
+    "validate",
+    "form",
+    "HTML5",
+    "VanillaJS",
+    "ES6",
+    "SASS",
+    "customizable"
+  ],
   "devDependencies": {
     "autoprefixer": "^6.4.0",
     "babel-core": "^6.18.2",
@@ -20,9 +28,6 @@
   },
   "dependencies": {
     "pixrem": "^3.0.2"
-  },
-  "directories": {
-    "test": "test"
   },
   "repository": {
     "type": "git",
