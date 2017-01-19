@@ -19,7 +19,7 @@
   };
 
   let _translationsFolderPath = '';
-  let _messages = {};
+  let _messages = null;
 
   /**
    * @function _getMessages
@@ -248,7 +248,7 @@
    * @private
    */
   const _getValidityState = function (element, useBrowserMessage, validationMoment = 'beforeSubmit') {
-    if (useBrowserMessage) {
+    if (useBrowserMessage || !_messages) {
       return element.validationMessage;
     }
 
