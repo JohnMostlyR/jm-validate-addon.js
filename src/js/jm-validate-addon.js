@@ -270,7 +270,10 @@
     this.form = _formByNameOrNode(formNameOrNode) || {};
     this.language = language;
 
-    this.form.createAttribute('novalidate');
+    // We need to set the novalidate attribute
+    if (!this.form.getAttribute('novalidate')) {
+      this.form.noValidate = true;
+    }
 
     // Get the required translations
     if (this.language && this.language !== 'en') {
