@@ -270,6 +270,8 @@
     this.form = _formByNameOrNode(formNameOrNode) || {};
     this.language = language;
 
+    this.form.createAttribute('novalidate');
+
     // Get the required translations
     if (this.language && this.language !== 'en') {
       _getMessagesTranslation(this.language);
