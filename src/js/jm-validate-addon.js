@@ -94,8 +94,8 @@
    * @function _formByNameOrNode
    * @description When passed a node it just returns it. When passed the form name it finds the node by name in the
    *  forms list.
-   * @param {!object|string} formNameOrNode - A reference to the form or the name of the form.
-   * @returns {object} - A reference to the form.
+   * @param {!Object|string} formNameOrNode - A reference to the form or the name of the form.
+   * @returns {Object} - A reference to the form.
    * @private
    */
   const _formByNameOrNode = function (formNameOrNode) {
@@ -105,7 +105,7 @@
   /**
    * @function _getElementLeft
    * @description Gets the element's left position on the screen.
-   * @param {object} element - Reference to the element.
+   * @param {Object} element - Reference to the element.
    * @returns {number|Number} - The element's left position on the screen.
    * @private
    */
@@ -122,7 +122,7 @@
   /**
    * @function _getElementTop
    * @description Gets the element's top position on the screen
-   * @param {object} element - Reference to the element
+   * @param {Object} element - Reference to the element
    * @returns {number|Number} - The element's left position on the screen
    * @private
    */
@@ -139,11 +139,11 @@
   /**
    * @function _createMessageTooltip
    * @description Creates the tooltip to give the user feedback on any validation issues.
-   * @param {!object|string} message - When passed a string it creates the tooltip above or below the field that is not
-   *  valid.
-   * @param {!object|string} [name.error] message - When passed an object a tooltip is created above or below the form
-   *  where each field that is not valid is on one line starting with the field's name and behind it the problem.
-   * @param {!object} field - The field to attach the tooltip to.
+   * @param {!Object|string} message - When passed a string it creates the tooltip above or below the field that is not
+   *  valid. When passed an object a tooltip is created above or below the form where each field that is not valid is on
+   *  one line starting with the field's name and behind it the problem.
+   * @param {string} message.validityState.message - The validity state and message.
+   * @param {!Object} field - The field to attach the tooltip to.
    * @param {boolean} [autoHide=true] - When true the tooltip will be removed after x seconds. When set to false the
    *  tooltip will stay until a key is pressed or a mouse button is clicked.
    * @private
@@ -234,7 +234,7 @@
   /**
    * @function _getValidityState
    * @description Get the validity state on the given element.
-   * @param {!object} element - The form element.
+   * @param {!Object} element - The form element.
    * @param {string} [validationMoment='beforeSubmit'] - The moment on where the validation takes place.
    * @returns {object} [fieldName.validityState]
    * @private
@@ -258,8 +258,8 @@
 
   /**
    * ValidationAddon
-   * @param {object|string} formNameOrNode
-   * @param {object} [language=defaults.language] A 2 letter language code according the ISO 639 standard.
+   * @param {Object|string} formNameOrNode
+   * @param {Object} [language=defaults.language] A 2 letter language code according the ISO 639 standard.
    * @param {boolean} [autoHide=defaults.autoHide] When true the tooltip will be removed after x seconds.
    *  When false the tooltip gets removed after the user clicks in the field with the error or presses any key.
    * @constructor

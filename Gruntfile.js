@@ -16,6 +16,15 @@ module.exports = function (grunt) {
         }]
       }
     },
+    jsdoc: { // Generate javascript doc
+      dist: {
+        src: ['src/**/*.js', 'README.md', 'package.json'],
+        options: {
+          destination: 'doc',
+          private: true
+        }
+      }
+    },
     sass: { // Compile SASS files
       dev: {
         options: {
@@ -68,7 +77,8 @@ module.exports = function (grunt) {
   [
     'grunt-babel',
     'grunt-sass',
-    'grunt-postcss'
+    'grunt-postcss',
+    'grunt-jsdoc'
   ].forEach(function (task) {
     grunt.loadNpmTasks(task);
   });
@@ -92,6 +102,7 @@ module.exports = function (grunt) {
       'babel:dist',                 // Compile ES6 to ES5 in the js folder and copy to public/assets/js
       'sass:dist',                  // Compile SASS to CSS in the sass folder and copy to public/assets/css
       'postcss',                    // Perform postcss tasks on css files in public/assets/css
+      'jsdoc',                      // Generate jsDoc
     ]
   );
 };
