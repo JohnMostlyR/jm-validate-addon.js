@@ -14,80 +14,87 @@
   const defaults = {
     autoHide: true,
     language: root.navigator.language.substr(0, 2),
-    messages: {
-      badInput: 'Please provide the correct input',
-      patternMismatch: 'Please provide input according the required pattern',
-      rangeOverflow: 'Please enter a value equal to or lower than the required maximum',
-      rangeUnderflow: 'Please enter a value equal to or higher than the required minimum',
-      stepMismatch: 'Please enter a value that fits any possible step',
-      tooLong: 'Please try to shorten your input',
-      typeMismatch: 'Please provide input according to the correct syntax',
-      valueMissing: {
-        beforeSubmit: 'Please do not forget to fill this in',
-        onSubmit: 'Sorry but we really need this information from you',
-      },
-    },
+    useBrowserMessages: false,
   };
 
-  let messages = defaults.messages;
+  let messages = {};
 
   /**
-   * @function _getMessagesTranslation
+   * @function _getMessages
    * @description Fetches the JSON file with the messages in the requested language.
    *  These files need to be placed in the same folder as this file in a subfolder named 'translations'.
    * @param {!string} language - A 2 letter language code according ISO 639.
+   * @returns {boolean} Returns true if we get a valid messages file. False otherwise.
    * @private
    */
-  const _getMessagesTranslation = function (language) {
-    const getTranslation = new XMLHttpRequest();
-    getTranslation.timeout = 5000;
-    getTranslation.onreadystatechange = () => {
-      if (getTranslation.readyState === XMLHttpRequest.DONE) {
-        if (getTranslation.status === 200) {
+  const _getMessages = function (language) {
+    const getMessages = new XMLHttpRequest();
+    getMessages.timeout = 5000;
+    getMessages.ontimeout = () => {
+      console.warn('Fetching of feedback messages timed out.');
+      console.warn('Now falling back to the default language.');
+      return false;
+    };
+    getMessages.onreadystatechange = () => {
+      if (getMessages.readyState === XMLHttpRequest.DONE) {
+        if (getMessages.status === 200) {
           try {
-            messages = root.JSON.parse(getTranslation.response).messages;
+            const fetchedMessages = root.JSON.parse(getMessages.response).messages;
 
-            // destructure with default value assignments
-            let {
-              badInput = defaults.messages.badInput,
-              patternMismatch = defaults.messages.patternMismatch,
-              rangeOverflow = defaults.messages.rangeOverflow,
-              rangeUnderflow = defaults.messages.rangeUnderflow,
-              stepMismatch = defaults.messages.stepMismatch,
-              tooLong = defaults.messages.tooLong,
-              typeMismatch = defaults.messages.typeMismatch,
-              valueMissing: {
-                beforeSubmit = defaults.messages.valueMissing.beforeSubmit,
-                onSubmit = defaults.messages.valueMissing.onSubmit
-              }
-            } = messages;
+            const requiredProperties = [
+              'badInput',
+              'patternMismatch',
+              'rangeOverflow',
+              'rangeUnderflow',
+              'stepMismatch',
+              'tooLong',
+              'typeMismatch',
+              'valueMissing'
+            ];
 
-            // ... and restructure again
-            messages = {
-              badInput,
-              patternMismatch,
-              rangeOverflow,
-              rangeUnderflow,
-              stepMismatch,
-              tooLong,
-              typeMismatch,
-              valueMissing: {
-                beforeSubmit,
-                onSubmit
+            // Check if the file contains the required properties
+            let isValid = requiredProperties
+              .filter((propertie) => {
+                return (!fetchedMessages[propertie]);
+              });
+
+            // Two leftover subproperties to check
+            if (fetchedMessages.valueMissing && typeof fetchedMessages.valueMissing === 'object') {
+              if (!fetchedMessages.valueMissing.beforeSubmit) {
+                isValid.push('valueMissing.beforeSubmit');
               }
-            };
+
+              if (!fetchedMessages.valueMissing.onSubmit) {
+                isValid.push('valueMissing.onSubmit');
+              }
+            }
+
+            console.log('isValid: ', isValid);
+
+            if (isValid.length > 0) {
+              console.warn(`The requested file for language '${language}' is missing one or more required properties`);
+              console.warn(`Missing these: ${isValid}`);
+              return false;
+            }
+
+            // Safely use the requested messages
+            messages = fetchedMessages;
+
+            return true;
           } catch (err) {
             console.warn(err.message);
           }
         } else {
-          console.warn(`Unable to find the translation file for ${language}`);
+          console.warn(`Unable to find the feedback messages file for ${language}`);
           console.warn('Now falling back to the default language.');
         }
       }
+
+      return false;
     };
 
-    getTranslation.open('GET', `translations/${language}.json`, true);
-    getTranslation.send();
+    getMessages.open('GET', `translations/${language}.json`, true);
+    getMessages.send();
   };
 
   /**
@@ -140,7 +147,7 @@
    * @function _createMessageTooltip
    * @description Creates the tooltip to give the user feedback on any validation issues.
    * @param {!Object|string} message - When passed a string it creates the tooltip above or below the field that is not
-   *  valid. When passed an object a tooltip is created above or below the form where each field that is not valid is on
+   *  valid. When passed an object a tooltip is created shown above or below the form where each field that is not valid is on
    *  one line starting with the field's name and behind it the problem.
    * @param {string} message.validityState.message - The validity state and message.
    * @param {!Object} field - The field to attach the tooltip to.
@@ -235,11 +242,16 @@
    * @function _getValidityState
    * @description Get the validity state on the given element.
    * @param {!Object} element - The form element.
+   * @param {!boolean} useBrowserMessage - If set to true, the browser configured message is used.
    * @param {string} [validationMoment='beforeSubmit'] - The moment on where the validation takes place.
    * @returns {object} [fieldName.validityState]
    * @private
    */
-  const _getValidityState = function (element, validationMoment = 'beforeSubmit') {
+  const _getValidityState = function (element, useBrowserMessage, validationMoment = 'beforeSubmit') {
+    if (useBrowserMessage) {
+      return element.validationMessage;
+    }
+
     const validity = element.validity;
     let message = element.validationMessage;
 
@@ -262,13 +274,21 @@
    * @param {Object} [language=defaults.language] A 2 letter language code according the ISO 639 standard.
    * @param {boolean} [autoHide=defaults.autoHide] When true the tooltip will be removed after x seconds.
    *  When false the tooltip gets removed after the user clicks in the field with the error or presses any key.
+   * @param {boolean} [useBrowserMessages=defaults.useBrowserMessages] When true the build in messages from the browser
+   *  will be used.
    * @constructor
    */
-  function ValidateAddon(formNameOrNode, {language = defaults.language, autoHide = defaults.autoHide} = {}) {
+  function ValidateAddon(
+    formNameOrNode,
+    {
+      language = defaults.language,
+      autoHide = defaults.autoHide,
+      useBrowserMessages = defaults.useBrowserMessages
+    } = {})
+  {
     this.autoHide = autoHide;
     this.errors = {};
     this.form = _formByNameOrNode(formNameOrNode) || {};
-    this.language = language;
 
     // We need to set the novalidate attribute
     if (!this.form.getAttribute('novalidate')) {
@@ -276,8 +296,11 @@
     }
 
     // Get the required translations
-    if (this.language && this.language !== 'en') {
-      _getMessagesTranslation(this.language);
+    if (!useBrowserMessages && language && language.length === 2 && _getMessages(language)) {
+      this.language = language;
+    } else {
+      // Fall back to the browser configured messages
+      this.useBrowserMessages = true;
     }
 
     // Get the fields to validate
@@ -295,7 +318,7 @@
           element.addEventListener('blur', (ev) => {
             // When the user moves away from the field, we check if the field is valid.
             if (!element.validity.valid) {
-              const message = _getValidityState(element);
+              const message = _getValidityState(element, this.useBrowserMessages);
               _createMessageTooltip(message, element, this.autoHide);
             }
 
@@ -320,7 +343,7 @@
           if (!this.form.elements[field].validity.valid) {
             isValid = false;
             this.errors[field] = {
-              error: _getValidityState(this.form.elements[field], 'onSubmit'),
+              error: _getValidityState(this.form.elements[field], this.useBrowserMessages, 'onSubmit'),
             };
           }
         });
@@ -341,7 +364,7 @@
      * @param {!string} language - A 2 letter language code according the ISO 639 standard.
      */
     setLanguage: function (language) {
-      _getMessagesTranslation(language);
+      _getMessages(language);
     }
   };
 

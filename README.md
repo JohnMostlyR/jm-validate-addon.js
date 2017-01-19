@@ -8,8 +8,6 @@ A HTML5 form validation add on that uses the HTML5 Constraint Validation API and
 
 This also means that it requires a browser that supports the HTML5 Constraint Validation API. No polyfill or shim is included.
 
-Tested with Chrome v55, Firefox v50.1 and Edge v38.
-
 # Usage
 Include both the stylesheet and the script in your page, as shown here in the prevered way, and create a new ValidateAddon object as soon as the DOM is ready.
 ```
@@ -29,13 +27,22 @@ Include both the stylesheet and the script in your page, as shown here in the pr
         	var validate = new ValidateAddon(
             	'the-form', // The name of the form or a reference to the form to validate
             	{
-            		language: 'nl', // Defaults to the browser's language setting, if that language is available
-                	autoHide: true, // Defaults to true
+            		language: 'en', // Get messages in this language. Defaults to the browser's language setting, when available
+                	autoHide: true, // Automatically hide the tooltip after x seconds. Defaults to true
+                	useBrowserMessages: false, // Use my own styling but use the messages as provided by the browser. Defaults to false
             	}
         	);
+
+            // Change or set the language at any time later on
+            validate.setLanguage('nl');
         });
 	</script>
 </body>
 ```
 
 # Features
+* Does not throw errors to the user for required fields as soon as the user is shown the form. Instead it shows the problem when the user moves away from the field.
+* When the user submits the form it does not just show the problem for the field that comes first. Instead a tooltip is shown with all fields and the problem there is with it.
+* The tooltip can be styled to fit your theme.
+* Provide your own feedback messages.
+* Override the browser its language setting.

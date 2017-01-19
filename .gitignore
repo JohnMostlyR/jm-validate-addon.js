@@ -6,3 +6,6 @@ node_modules
 
 # Source maps
 /dist/*.map
+
+# The doc folder
+doc

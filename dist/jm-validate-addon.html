@@ -45,8 +45,9 @@
     var validate = new ValidateAddon(
       'the-form', // The name of the form to validate
       {
-        language: 'nl', // Defaults to the browser's language setting, if that language is available
-        autoHide: true, // Defaults to true
+        language: 'en', // Get messages in this language. Defaults to the browser's language setting, when available
+        autoHide: true, // Automatically hide the tooltip after x seconds. Defaults to true
+        useBrowserMessages: false, // Use my own styling but use the messages as provided by the browser. Defaults to false
       }
     );
   });
