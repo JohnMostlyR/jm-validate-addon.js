@@ -14,10 +14,12 @@
   const defaults = {
     autoHide: true,
     language: root.navigator.language.substr(0, 2),
+    translationsFolderPath: 'translations',
     useBrowserMessages: false,
   };
 
-  let messages = {};
+  let _translationsFolderPath = '';
+  let _messages = {};
 
   /**
    * @function _getMessages
@@ -31,7 +33,7 @@
     const getMessages = new XMLHttpRequest();
     getMessages.timeout = 5000;
     getMessages.ontimeout = () => {
-      console.warn('Fetching of feedback messages timed out.');
+      console.warn('Fetching of feedback _messages timed out.');
       console.warn('Now falling back to the default language.');
       return false;
     };
@@ -77,8 +79,8 @@
               return false;
             }
 
-            // Safely use the requested messages
-            messages = fetchedMessages;
+            // Safely use the requested _messages
+            _messages = fetchedMessages;
 
             return true;
           } catch (err) {
@@ -93,7 +95,7 @@
       return false;
     };
 
-    getMessages.open('GET', `translations/${language}.json`, true);
+    getMessages.open('GET', `${_translationsFolderPath}/${language}.json`, true);
     getMessages.send();
   };
 
@@ -256,15 +258,15 @@
     let message = element.validationMessage;
 
     if (validity.valueMissing) {
-      return messages.valueMissing[validationMoment];
+      return _messages.valueMissing[validationMoment];
     } else {
       message = Object
-        .keys(messages)
+        .keys(_messages)
         .find((state) => {
           return (validity[state]);
         });
 
-      return messages[message];
+      return _messages[message];
     }
   };
 
@@ -274,8 +276,9 @@
    * @param {Object} [language=defaults.language] A 2 letter language code according the ISO 639 standard.
    * @param {boolean} [autoHide=defaults.autoHide] When true the tooltip will be removed after x seconds.
    *  When false the tooltip gets removed after the user clicks in the field with the error or presses any key.
-   * @param {boolean} [useBrowserMessages=defaults.useBrowserMessages] When true the build in messages from the browser
+   * @param {boolean} [useBrowserMessages=defaults.useBrowserMessages] When true the build in _messages from the browser
    *  will be used.
+   *  @param {string} translationsFolderPath
    * @constructor
    */
   function ValidateAddon(
@@ -283,12 +286,16 @@
     {
       language = defaults.language,
       autoHide = defaults.autoHide,
-      useBrowserMessages = defaults.useBrowserMessages
+      useBrowserMessages = defaults.useBrowserMessages,
+      translationsFolderPath = defaults.translationsFolderPath
     } = {})
   {
     this.autoHide = autoHide;
     this.errors = {};
     this.form = _formByNameOrNode(formNameOrNode) || {};
+
+    // Set the path to the folder where the translation files can be found
+    _translationsFolderPath = translationsFolderPath.replace(/\/$/, '');
 
     // We need to set the novalidate attribute
     if (!this.form.getAttribute('novalidate')) {
@@ -299,7 +306,7 @@
     if (!useBrowserMessages && language && language.length === 2 && _getMessages(language)) {
       this.language = language;
     } else {
-      // Fall back to the browser configured messages
+      // Fall back to the browser configured _messages
       this.useBrowserMessages = true;
     }
 
@@ -365,7 +372,7 @@
      */
     setLanguage: function (language) {
       _getMessages(language);
-    }
+    },
   };
 
   root.ValidateAddon = ValidateAddon;
