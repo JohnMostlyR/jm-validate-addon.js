@@ -55,7 +55,7 @@
             ];
 
             // Check if the file contains the required properties
-            let isValid = requiredProperties
+            let invalidProperties = requiredProperties
               .filter((propertie) => {
                 return (!fetchedMessages[propertie]);
               });
@@ -63,19 +63,17 @@
             // Two leftover subproperties to check
             if (fetchedMessages.valueMissing && typeof fetchedMessages.valueMissing === 'object') {
               if (!fetchedMessages.valueMissing.beforeSubmit) {
-                isValid.push('valueMissing.beforeSubmit');
+                invalidProperties.push('valueMissing.beforeSubmit');
               }
 
               if (!fetchedMessages.valueMissing.onSubmit) {
-                isValid.push('valueMissing.onSubmit');
+                invalidProperties.push('valueMissing.onSubmit');
               }
             }
 
-            console.log('isValid: ', isValid);
-
-            if (isValid.length > 0) {
+            if (invalidProperties.length > 0) {
               console.warn(`The requested file for language '${language}' is missing one or more required properties`);
-              console.warn(`Missing these: ${isValid}`);
+              console.warn(`Missing these: ${invalidProperties}`);
               return false;
             }
 
@@ -281,15 +279,13 @@
    *  @param {string} translationsFolderPath
    * @constructor
    */
-  function ValidateAddon(
-    formNameOrNode,
+  function ValidateAddon(formNameOrNode,
     {
       language = defaults.language,
       autoHide = defaults.autoHide,
       useBrowserMessages = defaults.useBrowserMessages,
       translationsFolderPath = defaults.translationsFolderPath
-    } = {})
-  {
+    } = {}) {
     this.autoHide = autoHide;
     this.errors = {};
     this.form = _formByNameOrNode(formNameOrNode) || {};
@@ -303,7 +299,8 @@
     }
 
     // Get the required translations
-    if (!useBrowserMessages && language && language.length === 2 && _getMessages(language)) {
+    if (!useBrowserMessages && language && language.length === 2) {
+      _getMessages(language);
       this.language = language;
     } else {
       // Fall back to the browser configured _messages

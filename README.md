@@ -30,6 +30,7 @@ Include both the stylesheet and the script in your page, as shown here in the pr
             		language: 'en', // Get messages in this language. Defaults to the browser's language setting, when available
                 	autoHide: true, // Automatically hide the tooltip after x seconds. Defaults to true
                 	useBrowserMessages: false, // Use my own styling but use the messages as provided by the browser. Defaults to false
+                	translationsFolderPath: 'translations', // Use this folder to find the messages. Defaults to 'translations'
             	}
         	);
 
