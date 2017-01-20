@@ -6,6 +6,7 @@
     "rangeUnderflow": "Please enter a value equal to or higher than the required minimum",
     "stepMismatch": "Please enter a value that fits any possible step",
     "tooLong": "Please try to shorten your input",
+    "tooShort": "Please add some more information",
     "typeMismatch": "Please provide input according to the correct syntax",
     "valueMissing": {
       "beforeSubmit": "Please do not forget to fill this in",
