@@ -5,7 +5,8 @@
     "rangeOverflow": "Voer alstublieft een waarde in die kleiner of gelijk is aan de maximaal toegestane waarde",
     "rangeUnderflow": "Voer alstublieft een waarde in die groter of gelijk is aan de minimaal toegestane waarde",
     "stepMismatch": "Voer alstublieft een waarde in die past op ieder toegestane stap",
-    "tooLong": "Voer alstublieft uw invoer te verkorten",
+    "tooLong": "Verkort alstublieft uw invoer",
+    "tooShort": "Voeg alstublieft meer informatie toe",
     "typeMismatch": "Voer alstublieft iets in volgens de correcte schrijfwijze",
     "valueMissing": {
       "beforeSubmit": "Vergeet U dit veld niet in te vullen?",
