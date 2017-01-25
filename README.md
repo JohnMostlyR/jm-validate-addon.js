@@ -18,7 +18,19 @@ Include both the stylesheet and the script in your page, as shown here in the pr
 <body>
 	...
     <form name="the-form" action="/" novalidate>
-    	...
+    	<fieldset>
+        	<legend>Signup</legend>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+            <br>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" minlength="8">
+            <br>
+            <input type="checkbox" name="terms-and-conditions" id="terms-and-conditions">
+            <label for="terms-and-conditions">I agree to the terms and conditions</label>
+            <br>
+            <button type="submit">Submit</button>
+        </fieldset>
     </form>
     ...
     <script src="jm-validate-addon.js"></script>
@@ -31,6 +43,14 @@ Include both the stylesheet and the script in your page, as shown here in the pr
                 	autoHide: true, // Automatically hide the tooltip after x seconds. Defaults to true
                 	useBrowserMessages: false, // Use my own styling but use the messages as provided by the browser. Defaults to false
                 	translationsFolderPath: 'translations', // Use this folder to find the messages. Defaults to 'translations'
+                    setCustomValidity: { // Add a custom validation
+                    	"terms-and-conditions": {
+                        	customFunction: function (element) {
+                            	return !!(element.checked);
+                            },
+                            message: 'Sorry, but we need you to accept the terms and conditions.'
+                        },
+                    },
             	}
         	);
 

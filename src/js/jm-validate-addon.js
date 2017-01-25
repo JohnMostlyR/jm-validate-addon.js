@@ -187,6 +187,7 @@
 
     const _showTooltip = function () {
       // Set max-width to be equal to the field's width
+      tooltip.style.minWidth = '250px';
       tooltip.style.maxWidth = `${field.offsetWidth}px`;
 
       const tooltipArrowHeight = 10;
@@ -195,7 +196,7 @@
       const fieldOffsetLeft = _getElementLeft(field);
       const fieldOffsetTop = _getElementTop(field);
 
-      let positionLeft = fieldOffsetLeft;
+      let positionLeft = fieldOffsetLeft + (field.offsetWidth / 2);
       let positionTop = fieldOffsetTop - tooltipHeight - tooltipArrowHeight;
 
       if (positionTop < 0) {
@@ -207,6 +208,7 @@
 
       tooltip.style.left = `${positionLeft}px`;
       tooltip.style.top = `${positionTop}px`;
+      tooltip.style.transform = 'translateX(-50%)';
 
       tooltip.classList.add('jm-validate-addon__tooltip--show');
     };
@@ -231,10 +233,17 @@
     }
 
     root.addEventListener('click', (ev) => {
-      if (ev.target === field) {
+      if (
+        ev.target === field
+        || (
+          ev.target.tagName.toUpperCase() === 'BUTTON'
+          && ev.target.type === 'submit'
+        )
+      ) {
         _removeTooltip();
       }
     });
+
     root.addEventListener('keydown', _removeTooltip);
   };
 
@@ -284,7 +293,8 @@
       language = defaults.language,
       autoHide = defaults.autoHide,
       useBrowserMessages = defaults.useBrowserMessages,
-      translationsFolderPath = defaults.translationsFolderPath
+      translationsFolderPath = defaults.translationsFolderPath,
+      setCustomValidity = {}
     } = {}) {
     this.autoHide = autoHide;
     this.errors = {};
@@ -321,7 +331,14 @@
         if (!fields[element.name]) {
           element.addEventListener('blur', (ev) => {
             // When the user moves away from the field, we check if the field is valid.
-            if (!element.validity.valid) {
+            const customValidity = setCustomValidity[element.getAttribute('name')];
+            if (customValidity) {
+              if (typeof customValidity.customFunction === 'function') {
+                if (!customValidity.customFunction(ev.target)) {
+                  _createMessageTooltip(customValidity.message, element, this.autoHide);
+                }
+              }
+            } else if (!element.validity.valid) {
               const message = _getValidityState(element, this.useBrowserMessages);
               _createMessageTooltip(message, element, this.autoHide);
             }
@@ -344,7 +361,17 @@
 
       Object.keys(this.fields)
         .forEach(field => {
-          if (!this.form.elements[field].validity.valid) {
+          const customValidity = setCustomValidity[field];
+          if (customValidity) {
+            if (typeof customValidity.customFunction === 'function') {
+              if (!customValidity.customFunction(ev.target.elements[field])) {
+                isValid = false;
+                this.errors[field] = {
+                  error: customValidity.message
+                };
+              }
+            }
+          } else if (!this.form.elements[field].validity.valid) {
             isValid = false;
             this.errors[field] = {
               error: _getValidityState(this.form.elements[field], this.useBrowserMessages, 'onSubmit'),

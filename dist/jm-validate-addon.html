@@ -19,6 +19,21 @@
             justify-content: center;
         }
 
+        fieldset {
+            border: 1px solid darkgray;
+            display: flex;
+            padding: 15px;
+        }
+
+        form {
+            width: 320px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+        }
+
         main {
             max-width: 980px;
         }
@@ -26,32 +41,48 @@
 </head>
 <body>
 <main>
-    <form name="the-form" action="/">
-        <label for="subject">Subject</label>
-        <input id="subject" name="subject" placeholder="Required field" autofocus required>
-        <br>
-        <label for="message">Message</label>
-        <textarea id="message" name="message" placeholder="Required field" required minlength="5"></textarea>
-        <br>
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="required@field.com" required>
-        <br>
-        <button type="submit">Submit</button>
+    <form name="the-form" action="/" novalidate>
+    	<fieldset>
+        	<legend>Signup</legend>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+            <br>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" minlength="8">
+            <br>
+            <div>
+                <input type="checkbox" name="terms-and-conditions" id="terms-and-conditions">
+                <label for="terms-and-conditions">I agree to the terms and conditions</label>
+            </div>
+            <br>
+            <button type="submit">Submit</button>
+        </fieldset>
     </form>
 </main>
 <script src="jm-validate-addon.js"></script>
-<script>
-  window.addEventListener('load', function (ev) {
-    var validate = new ValidateAddon(
-      'the-form', // The name of the form to validate
-      {
-        language: 'en', // Get messages in this language. Defaults to the browser's language setting, when available
-        autoHide: true, // Automatically hide the tooltip after x seconds. Defaults to true
-        useBrowserMessages: false, // Use my own styling but use the messages as provided by the browser. Defaults to false
-        translationsFolderPath: 'translations', // Use this folder to find the messages. Defaults to 'translations'
-      }
-    );
-  });
-</script>
+    <script>
+    	window.addEventListener('load', function (ev) {
+        	var validate = new ValidateAddon(
+            	'the-form', // The name of the form or a reference to the form to validate
+            	{
+            		language: 'en', // Get messages in this language. Defaults to the browser's language setting, when available
+                	autoHide: true, // Automatically hide the tooltip after x seconds. Defaults to true
+                	useBrowserMessages: false, // Use my own styling but use the messages as provided by the browser. Defaults to false
+                	translationsFolderPath: 'translations', // Use this folder to find the messages. Defaults to 'translations'
+                    setCustomValidity: { // Add a custom validation
+                    	"terms-and-conditions": {
+                        	customFunction: function (element) {
+                            	return !!(element.checked);
+                            },
+                            message: 'Sorry, but we need you to accept the terms and conditions.'
+                        },
+                    },
+            	}
+        	);
+
+            // Change or set the language at any time later on
+            validate.setLanguage('nl');
+        });
+	</script>
 </body>
 </html>
