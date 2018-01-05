@@ -1,4 +1,6 @@
 # jm-validate-addon
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/Mensae/jm-validate-addon.js.svg)](https://greenkeeper.io/)
 A HTML5 form validation add on with 0 dependencies
 
 # Description
